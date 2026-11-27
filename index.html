@@ -39,7 +39,7 @@
             background-color: #FFFFFF;
             min-height: 100vh;
             height: 100dvh;
-            padding: clamp(10px, 2vh, 22px) 0 0;
+            padding: clamp(10px, 2vh, 22px) 0 clamp(96px, 14dvh, 140px);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -194,7 +194,7 @@
         /* 3D Perspective Monitor + Desk Scene */
         .scene {
             position: relative;
-            width: min(100vw, calc(136dvh - 235px), 1140px);
+            width: min(100vw, calc(136dvh - 385px), 1140px);
             min-width: 310px;
             display: flex;
             flex-direction: column;
@@ -932,13 +932,13 @@
                 min-width: 130px;
             }
         }
-        /* ---------- Nepotism button under the desk (after 10 attempts) ---------- */
-        /* Desktop: pinned under the desk, bottom-left, so it stays on screen */
+        /* ---------- Nepotism sticker, tucked under the table (after 10 attempts) ---------- */
         .nepotism {
-            position: fixed;
-            left: 16px;
-            bottom: 16px;
-            width: min(260px, calc(100vw - 32px));
+            position: absolute;
+            left: 50%;
+            top: calc(100% + 14px);
+            transform: translateX(-50%);
+            width: min(300px, calc(100vw - 32px));
             text-align: center;
             z-index: 5;
         }
@@ -948,42 +948,103 @@
         }
 
         .nepotism-btn {
-            width: 100%;
-            min-height: 46px;
-            padding: 10px 16px;
-            border: 2px dashed #6B7280;
-            border-radius: 14px;
-            background: #F8FAFC;
-            color: #111827;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 52px;
+            padding: 12px 22px;
+            border: 2.5px solid #1F2937;
+            border-radius: 14px 14px 18px 14px;
+            background: linear-gradient(180deg, #FEF08A 0%, #FDE047 100%);
+            color: #713F12;
             font-family: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 800;
+            letter-spacing: -0.01em;
+            line-height: 1;
+            white-space: nowrap;
             cursor: pointer;
-            box-shadow: 0 4px 0 #CBD5E1;
-            transition: transform 0.12s ease, box-shadow 0.12s ease;
+            box-shadow: 0 5px 0 #1F2937, 0 10px 18px rgba(17, 24, 39, 0.18);
+            transform: rotate(-2.5deg);
+            transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .nepotism-btn::before {
+            content: "★";
+            color: #FF2A54;
+            font-size: 14px;
+            animation: sparkle-spin 3s ease-in-out infinite;
         }
 
         .nepotism-btn:hover:not(:disabled) {
-            transform: translateY(-1px);
+            transform: rotate(0deg) translateY(-2px) scale(1.04);
         }
 
         .nepotism-btn:active:not(:disabled) {
-            transform: translateY(3px);
-            box-shadow: 0 1px 0 #CBD5E1;
+            transform: rotate(-2.5deg) translateY(4px);
+            box-shadow: 0 1px 0 #1F2937;
+        }
+
+        .nepotism-btn:focus-visible {
+            outline: 3px solid #FDA4AF;
+            outline-offset: 4px;
+        }
+
+        .nepotism-btn.is-armed {
+            background: linear-gradient(180deg, #FF4D6D 0%, #FF2A54 100%);
+            color: #FFFFFF;
+            border-color: #82222B;
+            box-shadow: 0 5px 0 #8F2831, 0 10px 22px rgba(255, 42, 84, 0.4);
+            animation: nepotism-wiggle 0.6s ease-in-out infinite;
+        }
+
+        .nepotism-btn.is-armed::before {
+            color: #FEF08A;
         }
 
         .nepotism-btn:disabled {
             cursor: default;
-            opacity: 0.7;
         }
 
         .nepotism-note {
             min-height: 1.3em;
-            margin-top: 8px;
+            margin-top: 10px;
             color: #9F1239;
             font-size: 13px;
             font-weight: 700;
             line-height: 1.35;
+        }
+
+        @keyframes nepotism-wiggle {
+            0%, 100% { transform: rotate(-3deg) scale(1); }
+            50% { transform: rotate(2deg) scale(1.03); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .nepotism-btn,
+            .nepotism-btn::before,
+            .nepotism-btn.is-armed {
+                animation: none;
+            }
+        }
+
+        @media (max-width: 760px) {
+            body {
+                padding-bottom: 32px;
+            }
+
+            .nepotism {
+                position: static;
+                transform: none;
+                margin: 18px auto 0;
+                max-width: 100%;
+            }
+
+            .nepotism-btn {
+                transform: rotate(-2deg);
+            }
         }
 
         .celebrate-manual {
@@ -1736,6 +1797,7 @@
                 if (nepotismArmed) {
                     nepotismArmed = false;
                     nepotismBtn.textContent = 'Nepotism Button for Job';
+                    nepotismBtn.classList.remove('is-armed');
                     nepotismBtn.disabled = false;
                     nepotismNote.textContent = '';
                 }
@@ -2732,7 +2794,8 @@
                 if (hired || wheel.isSpinning || nepotismArmed) return;
                 nepotismArmed = true;
                 nepotismBtn.disabled = true;
-                nepotismBtn.textContent = 'Nepotism armed';
+                nepotismBtn.textContent = 'Rigged! Press GET A JOB';
+                nepotismBtn.classList.add('is-armed');
                 nepotismNote.textContent = 'Tip from your connection: the next GET A JOB button is the one. It is rigged to get you the job.';
             });
 
