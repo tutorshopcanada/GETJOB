@@ -604,7 +604,7 @@
             aspect-ratio: 4 / 3;
         }
 
-        #coral-puck-canvas {
+        #buzzer-canvas {
             display: block;
             width: 100%;
             height: 100%;
@@ -616,7 +616,7 @@
             filter: grayscale(1) opacity(0.5);
         }
 
-        .buzzer-wrapper.is-hired #coral-puck-canvas {
+        .buzzer-wrapper.is-hired #buzzer-canvas {
             cursor: not-allowed !important;
         }
 
@@ -932,6 +932,54 @@
                 min-width: 130px;
             }
         }
+        /* ---------- Restart button, bottom right ---------- */
+        .restart-btn {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 950;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 44px;
+            padding: 10px 18px;
+            border: 2.5px solid #1F2937;
+            border-radius: 999px;
+            background: #FFFFFF;
+            color: #111827;
+            font-family: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #1F2937;
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px) rotate(-2deg);
+        }
+
+        .restart-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #1F2937;
+        }
+
+        .restart-btn:focus-visible {
+            outline: 3px solid #FDA4AF;
+            outline-offset: 3px;
+        }
+
+        .restart-icon {
+            display: inline-block;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .restart-btn.is-spinning .restart-icon {
+            transform: rotate(360deg);
+        }
+
         /* ---------- Nepotism sticker, tucked under the table (after 10 attempts) ---------- */
         .nepotism {
             position: absolute;
@@ -1033,6 +1081,10 @@
         @media (max-width: 760px) {
             body {
                 padding-bottom: 32px;
+            }
+
+            .hired-share {
+                bottom: 76px;
             }
 
             .nepotism {
@@ -1208,7 +1260,7 @@
 
                     <!-- Mug body -->
                     <path d="M82 146 V183 C82 192 94 198 109 198 C124 198 136 192 136 183 V146 Z" fill="url(#mugGrad)" stroke="#1E293B" stroke-width="2.4" stroke-linejoin="round"/>
-                    <!-- Tiny coral heart badge on mug -->
+                    <!-- Tiny heart badge on mug -->
                     <path d="M109 178 C109 178 101 172.5 101 167.8 C101 165.2 103.2 163.5 105.5 163.5 C107.1 163.5 108.4 164.4 109 165.6 C109.6 164.4 110.9 163.5 112.5 163.5 C114.8 163.5 117 165.2 117 167.8 C117 172.5 109 178 109 178 Z" fill="#FF4D6D"/>
 
                     <!-- Mug rim & coffee surface -->
@@ -1252,7 +1304,7 @@
                     <polygon points="570,154 636,157 654,209 582,208" fill="#E2E8F0" stroke="#334155" stroke-width="2" stroke-linejoin="round"/>
                     <!-- Top resume sheet -->
                     <polygon points="564,151 630,159 646,211 574,205" fill="#FFFFFF" stroke="#1E293B" stroke-width="2.2" stroke-linejoin="round"/>
-                    <!-- Coral header bar + avatar dot -->
+                    <!-- header bar + avatar dot -->
                     <circle cx="580" cy="165" r="5" fill="#FF4D6D"/>
                     <line x1="590" y1="163.5" x2="620" y2="167" stroke="#1E293B" stroke-width="2.5" stroke-linecap="round"/>
                     <line x1="590" y1="169" x2="612" y2="171.5" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/>
@@ -1261,7 +1313,7 @@
                     <line x1="580" y1="186" x2="628" y2="191" stroke="#CBD5E1" stroke-width="2.2" stroke-linecap="round"/>
                     <line x1="582" y1="193" x2="616" y2="196.5" stroke="#CBD5E1" stroke-width="2.2" stroke-linecap="round"/>
 
-                    <!-- Angled Coral Gel Pen Resting Beside Papers -->
+                    <!-- Angled Gel Pen Resting Beside Papers -->
                     <g transform="translate(556, 200) rotate(-18)">
                         <rect x="0" y="0" width="48" height="7" rx="3.5" fill="#FF4D6D" stroke="#82222B" stroke-width="1.8"/>
                         <polygon points="48,0.8 56,3.5 48,6.2" fill="#FDE68A" stroke="#82222B" stroke-width="1.6" stroke-linejoin="round"/>
@@ -1271,7 +1323,7 @@
             </svg>
 
             <div id="buzzer-wrapper" class="buzzer-wrapper">
-                <canvas id="coral-puck-canvas" aria-label="Get a Job" role="button" tabindex="0"></canvas>
+                <canvas id="buzzer-canvas" aria-label="Get a Job" role="button" tabindex="0"></canvas>
             </div>
         </div>
 
@@ -1280,6 +1332,10 @@
             <p id="nepotism-note" class="nepotism-note" aria-live="polite"></p>
         </div>
     </div>
+
+    <button type="button" id="restart-btn" class="restart-btn">
+        <span class="restart-icon" aria-hidden="true">↻</span> Restart
+    </button>
 
     <!-- Shown once the 0.7% job offer lands -->
     <div id="hired-share" class="hired-share" hidden>
@@ -1314,7 +1370,7 @@
          * ====================================================================
          */
         (() => {
-            const canvas = document.getElementById('coral-puck-canvas');
+            const canvas = document.getElementById('buzzer-canvas');
             const ctx = canvas.getContext('2d');
             const wheelCanvas = document.getElementById('wheel-canvas');
             const wheelCtx = wheelCanvas.getContext('2d');
@@ -2047,7 +2103,7 @@
                 wheelCtx.strokeStyle = '#0F172A';
                 wheelCtx.stroke();
 
-                // Center coral dot
+                // Center dot
                 wheelCtx.beginPath();
                 wheelCtx.arc(cx, cy, hubR * 0.42, 0, TWO_PI);
                 wheelCtx.fillStyle = '#FF2A54';
@@ -2309,7 +2365,7 @@
                 ctx.strokeStyle = CONFIG.baseStroke;
                 ctx.stroke();
 
-                // Front status LED on the extruded bezel (green at rest, coral when active)
+                // Front status LED on the extruded bezel (green at rest, when active)
                 const ledActive = buzzer.isPressed || wheel.isSpinning;
                 ctx.save();
                 ctx.beginPath();
@@ -2405,7 +2461,7 @@
                 ctx.fill();
                 ctx.restore();
 
-                // Extruded 3D coral cylinder wall
+                // Extruded 3D cylinder wall
                 const wallGrad = ctx.createLinearGradient(-rx, 0, rx, 0);
                 wallGrad.addColorStop(0.0, CONFIG.wallDark);
                 wallGrad.addColorStop(0.24, CONFIG.wallColor);
@@ -2423,7 +2479,7 @@
                 ctx.strokeStyle = CONFIG.rimStroke;
                 ctx.stroke();
 
-                // Coral Top Cap Surface
+                // Top Cap Surface
                 const lightShiftY = dep * 5;
                 const topGrad = ctx.createRadialGradient(0, topY - 12 + lightShiftY, 8, 0, topY, rx * 1.1);
                 topGrad.addColorStop(0, CONFIG.topCenter);
@@ -2481,7 +2537,7 @@
 
             // 3B. Job-Offer State, Celebration & Share
             // Landing the 0.7% offer retires the buzzer. The state is kept per browser.
-            const HIRED_KEY = 'coralPuckHired';
+            const HIRED_KEY = 'buzzerHired';
             const SHARE_URL = 'https://getjob.pages.dev/';
             const buzzerWrapperEl = document.getElementById('buzzer-wrapper');
             const celebrateEl = document.getElementById('celebrate');
@@ -2512,6 +2568,8 @@
             let celebrateW = 0;
             let celebrateH = 0;
             let toastTimer = 0;
+            let winTimer = 0;
+            const restartBtn = document.getElementById('restart-btn');
             let nepotismArmed = false;
             let lastSpinRigged = false;
             let celebrateRigged = false;
@@ -2558,7 +2616,7 @@
                 writeHired(apps);
                 applyHiredState(apps);
                 // Let the wheel-landing moment register before the party starts
-                setTimeout(() => openCelebration(apps, true, lastSpinRigged), 900);
+                winTimer = setTimeout(() => openCelebration(apps, true, lastSpinRigged), 900);
             }
 
             function sizeCelebrateCanvas() {
@@ -2789,6 +2847,46 @@
             function refreshNepotism() {
                 nepotismEl.hidden = hired || wheel.apps < 5;
             }
+
+            function resetGame() {
+                clearTimeout(winTimer);
+                closeCelebration();
+                wheel.isSpinning = false;
+                wheel.winningSeg = null;
+                wheel.particles = [];
+                wheel.highlightTimer = 0;
+                wheel.apps = 0;
+                hideResultPopup();
+                monitorLedEl.classList.remove('is-spinning');
+
+                hired = false;
+                try { localStorage.removeItem(HIRED_KEY); } catch (e) {}
+                buzzerWrapperEl.classList.remove('is-hired');
+                canvas.setAttribute('aria-disabled', 'false');
+                canvas.setAttribute('tabindex', '0');
+                canvas.setAttribute('aria-label', 'Get a Job');
+                appsCounterEl.innerHTML = 'Apps: <strong>0</strong>';
+                wheelStatusEl.textContent = '0.7% Offer Odds · Spin';
+                wheelStatusEl.classList.remove('is-win');
+                hiredShareEl.hidden = true;
+
+                nepotismArmed = false;
+                lastSpinRigged = false;
+                celebrateRigged = false;
+                nepotismBtn.disabled = false;
+                nepotismBtn.textContent = 'Nepotism Button for Job';
+                nepotismBtn.classList.remove('is-armed');
+                nepotismNote.textContent = '';
+                jobAttempt = rollJobAttempt();
+                refreshNepotism();
+            }
+
+            restartBtn.addEventListener('click', () => {
+                restartBtn.classList.remove('is-spinning');
+                void restartBtn.offsetWidth;
+                restartBtn.classList.add('is-spinning');
+                resetGame();
+            });
 
             nepotismBtn.addEventListener('click', () => {
                 if (hired || wheel.isSpinning || nepotismArmed) return;
