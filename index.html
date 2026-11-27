@@ -616,10 +616,6 @@
             outline: none;
         }
         /* ---------- Job-offer state: buzzer retired ---------- */
-        .buzzer-wrapper.is-hired {
-            filter: grayscale(1) opacity(0.5);
-        }
-
         .buzzer-wrapper.is-hired #buzzer-canvas {
             cursor: not-allowed !important;
         }
@@ -864,7 +860,7 @@
                 height: auto;
                 min-height: 100vh;
                 min-height: 100dvh;
-                padding: 18px 16px 32px;
+                padding: 18px 16px 96px;
                 justify-content: flex-start;
                 overflow-x: hidden;
                 overflow-y: visible;
@@ -1088,14 +1084,16 @@
 
         @media (max-width: 760px) {
             body {
-                padding-bottom: 32px;
+                padding-bottom: 96px;
             }
 
-            .restart-btn {
+            .hired-share {
                 position: static;
-                display: flex;
-                width: max-content;
-                margin: 18px auto 0;
+                transform: none;
+                animation: none;
+                align-self: flex-start;
+                width: 220px;
+                margin: 18px 0 0;
             }
 
             .nepotism {
@@ -1410,6 +1408,15 @@
                 // Heavy spring preset
                 stiffness: 220,
                 damping: 28
+            };
+
+            // Greyed-out plunger palette, used only after the job is landed
+            const HIRED_PAL = {
+                wallColor: '#6B7280',
+                wallDark: '#4B5563',
+                topCenter: '#9CA3AF',
+                topEdge: '#6B7280',
+                rimStroke: '#374151'
             };
 
             // 2A. Pre-Initialized Web Audio Synthesizer (Zero First-Press Lag)
@@ -2208,6 +2215,7 @@
 
             // 3. Buzzer State (Heavy Spring)
             const buzzer = {
+                isHired: false,
                 width: 0,
                 height: 0,
                 isPressed: false,
@@ -2448,6 +2456,7 @@
                 ctx.stroke();
 
                 // ============================================================
+                const pal = buzzer.isHired ? HIRED_PAL : CONFIG;
                 // 3. EXTRUDED 3D PLUNGER (HEAVY SPRING)
                 // ============================================================
                 const plungerBaseY = wellY + 1;
@@ -2468,16 +2477,16 @@
                 ctx.shadowOffsetY = 3 - dep * 2;
                 ctx.beginPath();
                 ctx.ellipse(0, plungerBaseY, rx, ry, 0, 0, TWO_PI);
-                ctx.fillStyle = CONFIG.wallDark;
+                ctx.fillStyle = pal.wallDark;
                 ctx.fill();
                 ctx.restore();
 
                 // Extruded 3D cylinder wall
                 const wallGrad = ctx.createLinearGradient(-rx, 0, rx, 0);
-                wallGrad.addColorStop(0.0, CONFIG.wallDark);
-                wallGrad.addColorStop(0.24, CONFIG.wallColor);
-                wallGrad.addColorStop(0.76, CONFIG.wallColor);
-                wallGrad.addColorStop(1.0, CONFIG.wallDark);
+                wallGrad.addColorStop(0.0, pal.wallDark);
+                wallGrad.addColorStop(0.24, pal.wallColor);
+                wallGrad.addColorStop(0.76, pal.wallColor);
+                wallGrad.addColorStop(1.0, pal.wallDark);
 
                 ctx.beginPath();
                 ctx.ellipse(0, plungerBaseY, rx, ry, 0, 0, Math.PI);
@@ -2487,14 +2496,14 @@
                 ctx.fillStyle = wallGrad;
                 ctx.fill();
                 ctx.lineWidth = 1.6;
-                ctx.strokeStyle = CONFIG.rimStroke;
+                ctx.strokeStyle = pal.rimStroke;
                 ctx.stroke();
 
                 // Top Cap Surface
                 const lightShiftY = dep * 5;
                 const topGrad = ctx.createRadialGradient(0, topY - 12 + lightShiftY, 8, 0, topY, rx * 1.1);
-                topGrad.addColorStop(0, CONFIG.topCenter);
-                topGrad.addColorStop(1, CONFIG.topEdge);
+                topGrad.addColorStop(0, pal.topCenter);
+                topGrad.addColorStop(1, pal.topEdge);
 
                 ctx.beginPath();
                 ctx.ellipse(0, topY, rx, ry, 0, 0, TWO_PI);
@@ -2524,7 +2533,7 @@
                 ctx.beginPath();
                 ctx.ellipse(0, topY, rx, ry, 0, 0, TWO_PI);
                 ctx.lineWidth = 1.7;
-                ctx.strokeStyle = CONFIG.rimStroke;
+                ctx.strokeStyle = pal.rimStroke;
                 ctx.stroke();
 
                 // Silkscreened 2.5D Perspective "GET A JOB" Typography
@@ -2610,12 +2619,13 @@
 
             function applyHiredState(apps) {
                 hired = true;
+                buzzer.isHired = true;
                 buzzer.isHovered = false;
                 buzzerWrapperEl.classList.add('is-hired');
                 canvas.setAttribute('aria-disabled', 'true');
                 canvas.setAttribute('tabindex', '-1');
                 canvas.setAttribute('aria-label', 'Get a Job, button retired after landing a job');
-                wheelStatusEl.textContent = '★ Job secured. Button retired ★';
+                wheelStatusEl.textContent = '★ Job secured ★';
                 wheelStatusEl.classList.add('is-win');
                 appsCounterEl.innerHTML = `Apps: <strong>${apps}</strong>`;
                 hiredShareEl.hidden = false;
@@ -2873,6 +2883,7 @@
                 monitorLedEl.classList.remove('is-spinning');
 
                 hired = false;
+                buzzer.isHired = false;
                 try { localStorage.removeItem(HIRED_KEY); } catch (e) {}
                 buzzerWrapperEl.classList.remove('is-hired');
                 canvas.setAttribute('aria-disabled', 'false');
