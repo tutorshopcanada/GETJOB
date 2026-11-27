@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Find a Job in 2026 — Coral Puck Buzzer</title>
-    <meta name="description" content="Find a job in 2026 with Coral Puck Buzzer, built on real Toronto job data.">
+    <title>Find a Job in 2026</title>
+    <meta name="description" content="Find a job in 2026, built on real Toronto job data.">
     <link rel="canonical" href="https://getjob.pages.dev/">
 
     <!-- Open Graph / LinkedIn / Facebook preview -->
     <meta property="og:type" content="website">
-    <meta property="og:site_name" content="Coral Puck Buzzer">
-    <meta property="og:title" content="Find a Job in 2026 — Coral Puck Buzzer">
-    <meta property="og:description" content="Find a job in 2026 with Coral Puck Buzzer, built on real Toronto job data.">
+    <meta property="og:site_name" content="Find a Job in 2026">
+    <meta property="og:title" content="Find a Job in 2026">
+    <meta property="og:description" content="Find a job in 2026, built on real Toronto job data.">
     <meta property="og:url" content="https://getjob.pages.dev/">
     <meta property="og:image" content="https://getjob.pages.dev/og-image.png">
     <meta property="og:image:secure_url" content="https://getjob.pages.dev/og-image.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Find a Job in 2026 — Coral Puck Buzzer">
+    <meta property="og:image:alt" content="Find a Job in 2026">
 
     <!-- Twitter / X card -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Find a Job in 2026 — Coral Puck Buzzer">
-    <meta name="twitter:description" content="Find a job in 2026 with Coral Puck Buzzer, built on real Toronto job data.">
+    <meta name="twitter:title" content="Find a Job in 2026">
+    <meta name="twitter:description" content="Find a job in 2026, built on real Toronto job data.">
     <meta name="twitter:image" content="https://getjob.pages.dev/og-image.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -611,6 +611,327 @@
             touch-action: manipulation;
             outline: none;
         }
+        /* ---------- Job-offer state: buzzer retired ---------- */
+        .buzzer-wrapper.is-hired {
+            filter: grayscale(1) opacity(0.5);
+        }
+
+        .buzzer-wrapper.is-hired #coral-puck-canvas {
+            cursor: not-allowed !important;
+        }
+
+        /* ---------- Share buttons ---------- */
+        .share-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            min-height: 48px;
+            padding: 10px 14px;
+            border: 2px solid #1F2937;
+            border-radius: 14px;
+            background: #FFFFFF;
+            color: #111827;
+            font-family: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            line-height: 1;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #1F2937;
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .share-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .share-btn:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #1F2937;
+        }
+
+        .share-btn:focus-visible {
+            outline: 3px solid #FDA4AF;
+            outline-offset: 3px;
+        }
+
+        .share-btn--primary {
+            background: #FF2A54;
+            color: #FFFFFF;
+            border-color: #82222B;
+            box-shadow: 0 4px 0 #8F2831;
+        }
+
+        .share-btn--primary:active {
+            box-shadow: 0 1px 0 #8F2831;
+        }
+
+        .share-btn--whatsapp {
+            background: #25D366;
+            color: #FFFFFF;
+        }
+
+        .share-btn--linkedin {
+            background: #0A66C2;
+            color: #FFFFFF;
+        }
+
+        .share-btn--x {
+            background: #111827;
+            color: #FFFFFF;
+            box-shadow: 0 4px 0 #030712;
+        }
+
+        .share-btn--copy {
+            background: #F1F5F9;
+        }
+
+        /* ---------- Persistent "share my win" bar after hire ---------- */
+        .hired-share {
+            position: fixed;
+            left: 50%;
+            bottom: max(16px, env(safe-area-inset-bottom));
+            z-index: 900;
+            width: min(calc(100% - 32px), 320px);
+            transform: translateX(-50%);
+            animation: hired-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .hired-share[hidden],
+        .celebrate[hidden] {
+            display: none;
+        }
+
+        @keyframes hired-pop {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* ---------- Job-offer celebration overlay ---------- */
+        .celebrate {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.72);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .celebrate.is-open {
+            opacity: 1;
+        }
+
+        .celebrate-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .celebrate-card {
+            position: relative;
+            width: min(100%, 380px);
+            max-height: calc(100vh - 40px);
+            max-height: calc(100dvh - 40px);
+            overflow-y: auto;
+            padding: 26px 20px 18px;
+            border: 2.5px solid #1F2937;
+            border-radius: 26px;
+            background: #FFFFFF;
+            box-shadow: 0 8px 0 #1F2937, 0 24px 60px rgba(0, 0, 0, 0.35);
+            text-align: center;
+            transform: translateY(24px) scale(0.85) rotate(-2deg);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .celebrate.is-open .celebrate-card {
+            transform: translateY(0) scale(1) rotate(-1deg);
+        }
+
+        .celebrate-kicker {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 999px;
+            background: #FFE4E6;
+            color: #9F1239;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .celebrate-title {
+            margin: 14px 0 10px;
+            color: #111827;
+            font-family: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: clamp(2.2rem, 10vw, 2.9rem);
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            line-height: 1;
+        }
+
+        .celebrate-title span {
+            display: inline-block;
+            color: #FF2A54;
+            text-shadow: 0 3px 0 #FFA8B6;
+            animation: celebrate-wiggle 1.6s ease-in-out infinite;
+        }
+
+        @keyframes celebrate-wiggle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg) scale(1.05); }
+        }
+
+        .celebrate-sub {
+            color: #4B5563;
+            font-size: 16px;
+            line-height: 1.45;
+        }
+
+        .celebrate-sub strong {
+            color: #111827;
+        }
+
+        .celebrate-share {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .celebrate-share .share-btn--primary {
+            grid-column: 1 / -1;
+        }
+
+        .share-toast {
+            min-height: 1.4em;
+            margin-top: 12px;
+            color: #9F1239;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .celebrate-close {
+            min-height: 44px;
+            padding: 0 16px;
+            border: 0;
+            background: none;
+            color: #6B7280;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .celebrate-title span,
+            .hired-share {
+                animation: none;
+            }
+
+            .celebrate,
+            .celebrate-card {
+                transition: none;
+            }
+        }
+
+        /* ---------- Mobile layout (phones, incl. iOS Safari) ----------
+           On phones the page flows naturally and scrolls instead of being
+           clipped to the viewport height (which hid the desk and button). */
+        @media (max-width: 760px) {
+            body {
+                height: auto;
+                min-height: 100vh;
+                min-height: 100dvh;
+                padding: 18px 16px 32px;
+                justify-content: flex-start;
+                overflow-x: hidden;
+                overflow-y: visible;
+            }
+
+            .hero-title {
+                margin: 6px 0 18px;
+                font-size: clamp(2.5rem, 12.5vw, 3.7rem);
+                line-height: 1.02;
+                gap: 0.1em 0.2em;
+            }
+
+            .scene {
+                width: 100%;
+                max-width: 440px;
+                min-width: 0;
+            }
+
+            .monitor-rig {
+                width: 80%;
+            }
+
+            .hud-optional {
+                display: none;
+            }
+
+            .monitor-hud {
+                top: 6px;
+                left: 6px;
+                right: 6px;
+            }
+
+            .hud-pill {
+                padding: 3px 7px;
+                font-size: 10px;
+            }
+
+            .wheel-status {
+                font-size: 11px;
+            }
+
+            .result-popup {
+                width: min(92%, 300px);
+                padding: 11px 13px 12px;
+            }
+
+            .result-popup-title {
+                font-size: 17px;
+            }
+
+            .result-popup-quip {
+                font-size: 13px;
+            }
+
+            .monitor-sticky {
+                font-size: 10.5px;
+            }
+
+            .monitor-brand {
+                font-size: 11px;
+            }
+
+            .data-bubble {
+                font-size: 14px;
+            }
+
+            .buzzer-wrapper {
+                width: 46%;
+                min-width: 130px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -638,7 +959,7 @@
                 <div class="monitor-sticky" aria-hidden="true">HIRE<br>ME!</div>
                 <div id="monitor-screen" class="monitor-screen">
                     <div class="monitor-hud" aria-hidden="true">
-                        <span class="hud-pill">Toronto · <strong>7.1% Unemp</strong></span>
+                        <span class="hud-pill"><span class="hud-optional">Toronto · </span><strong>7.1% Unemp</strong></span>
                         <span id="apps-counter" class="hud-pill">Apps: <strong>0</strong></span>
                     </div>
                     <canvas id="wheel-canvas" aria-label="Toronto 2026 job search odds wheel"></canvas>
@@ -813,16 +1134,39 @@
                 </g>
             </svg>
 
-            <div class="buzzer-wrapper">
+            <div id="buzzer-wrapper" class="buzzer-wrapper">
                 <canvas id="coral-puck-canvas" aria-label="Get a Job" role="button" tabindex="0"></canvas>
             </div>
+        </div>
+    </div>
+
+    <!-- Shown once the 0.7% job offer lands -->
+    <div id="hired-share" class="hired-share" hidden>
+        <button type="button" id="hired-share-btn" class="share-btn share-btn--primary">★ Share my win</button>
+    </div>
+
+    <div id="celebrate" class="celebrate" role="dialog" aria-modal="true" aria-labelledby="celebrate-title" hidden>
+        <canvas id="celebrate-canvas" class="celebrate-canvas" aria-hidden="true"></canvas>
+        <div class="celebrate-card">
+            <span class="celebrate-kicker">★ 0.7% miracle unlocked ★</span>
+            <h2 id="celebrate-title" class="celebrate-title">You got the <span>job!</span></h2>
+            <p class="celebrate-sub">After <strong id="celebrate-apps">0</strong> <span id="celebrate-noun">applications</span>, the buzzer finally paid off. Now go tell everyone.</p>
+            <div class="celebrate-share">
+                <button type="button" class="share-btn share-btn--primary" data-share="native">Share my win</button>
+                <button type="button" class="share-btn share-btn--whatsapp" data-share="whatsapp">WhatsApp</button>
+                <button type="button" class="share-btn share-btn--linkedin" data-share="linkedin">LinkedIn</button>
+                <button type="button" class="share-btn share-btn--x" data-share="x">X</button>
+                <button type="button" class="share-btn share-btn--copy" data-share="copy">Copy link</button>
+            </div>
+            <p id="share-toast" class="share-toast" role="status" aria-live="polite"></p>
+            <button type="button" id="celebrate-close" class="celebrate-close">Close</button>
         </div>
     </div>
 
     <script>
         /**
          * ====================================================================
-         * CORAL PUCK BUZZER — HEAVY SPRING EDITION + MONITOR WHEEL
+         * HEAVY SPRING EDITION + MONITOR WHEEL
          * Self-contained 2.5D HTML5 Canvas button with damped spring physics,
          * interactive monitor wheel, and dual-stage Web Audio feedback.
          * ====================================================================
@@ -1374,6 +1718,7 @@
                         playResultChime(seg.isWin);
                         spawnOutcomeParticles(seg);
                         showResultPopup(seg);
+                        if (seg.isWin) onWin();
 
                         if (seg.fx === 'reject') {
                             triggerScreenShake();
@@ -1640,7 +1985,7 @@
                 }
             }
 
-            // 3. Coral Puck Buzzer State (Heavy Spring)
+            // 3. Buzzer State (Heavy Spring)
             const buzzer = {
                 width: 0,
                 height: 0,
@@ -1676,7 +2021,7 @@
             }
 
             function pressBuzzer() {
-                if (buzzer.isPressed) return;
+                if (buzzer.isPressed || hired) return;
                 buzzer.isPressed = true;
                 playPressSound();
                 spinWheel();
@@ -1691,7 +2036,7 @@
             // Mouse, Touch & Keyboard Controls
             canvas.addEventListener('mousemove', (e) => {
                 const inside = isPointInsideButton(e.clientX, e.clientY);
-                buzzer.isHovered = inside;
+                buzzer.isHovered = inside && !hired;
                 canvas.style.cursor = inside ? 'pointer' : 'default';
             });
 
@@ -1713,7 +2058,7 @@
             canvas.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 const t = e.touches[0];
-                if (t && isPointInsideButton(t.clientX, t.clientY)) {
+                if (t && !hired && isPointInsideButton(t.clientX, t.clientY)) {
                     buzzer.isHovered = true;
                     pressBuzzer();
                 }
@@ -1730,7 +2075,7 @@
             });
 
             window.addEventListener('keydown', (e) => {
-                if (e.repeat) return;
+                if (e.repeat || celebrating) return;
                 if (e.code === 'Space' || e.code === 'Enter') {
                     e.preventDefault();
                     pressBuzzer();
@@ -1882,7 +2227,7 @@
                 ctx.stroke();
 
                 // ============================================================
-                // 3. EXTRUDED 3D CORAL PUCK PLUNGER (HEAVY SPRING)
+                // 3. EXTRUDED 3D PLUNGER (HEAVY SPRING)
                 // ============================================================
                 const plungerBaseY = wellY + 1;
                 const maxExtrusion = 21;
@@ -1980,10 +2325,307 @@
                 ctx.restore();
             }
 
+            // 3B. Job-Offer State, Celebration & Share
+            // Landing the 0.7% offer retires the buzzer. The state is kept per browser.
+            const HIRED_KEY = 'coralPuckHired';
+            const SHARE_URL = 'https://getjob.pages.dev/';
+            const buzzerWrapperEl = document.getElementById('buzzer-wrapper');
+            const celebrateEl = document.getElementById('celebrate');
+            const celebrateCanvas = document.getElementById('celebrate-canvas');
+            const celebrateCtx = celebrateCanvas.getContext('2d');
+            const celebrateAppsEl = document.getElementById('celebrate-apps');
+            const celebrateNounEl = document.getElementById('celebrate-noun');
+            const celebrateCloseEl = document.getElementById('celebrate-close');
+            const shareToastEl = document.getElementById('share-toast');
+            const hiredShareEl = document.getElementById('hired-share');
+            const hiredShareBtn = document.getElementById('hired-share-btn');
+            const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+            const CELEBRATE_COLORS = ['#FF2A54', '#FF4D6D', '#FEF08A', '#34D399', '#60A5FA', '#C084FC', '#FDBA74', '#FFFFFF'];
+
+            let hired = false;
+            let celebrating = false;
+            let celebrateRaf = 0;
+            let celebrateStart = 0;
+            let celebrateLast = 0;
+            let celebrateBursts = [];
+            let celebrateRain = false;
+            let celebrateParticles = [];
+            let celebrateApps = 0;
+            let celebrateW = 0;
+            let celebrateH = 0;
+            let toastTimer = 0;
+
+            function readHired() {
+                try {
+                    const raw = localStorage.getItem(HIRED_KEY);
+                    return raw ? JSON.parse(raw) : null;
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            function writeHired(apps) {
+                try {
+                    localStorage.setItem(HIRED_KEY, JSON.stringify({ apps }));
+                } catch (e) {}
+            }
+
+            function applyHiredState(apps) {
+                hired = true;
+                buzzer.isHovered = false;
+                buzzerWrapperEl.classList.add('is-hired');
+                canvas.setAttribute('aria-disabled', 'true');
+                canvas.setAttribute('tabindex', '-1');
+                canvas.setAttribute('aria-label', 'Get a Job, button retired after landing a job');
+                wheelStatusEl.textContent = '★ Job secured. Button retired ★';
+                wheelStatusEl.classList.add('is-win');
+                appsCounterEl.innerHTML = `Apps: <strong>${apps}</strong>`;
+                hiredShareEl.hidden = false;
+            }
+
+            function onWin() {
+                const apps = wheel.apps;
+                writeHired(apps);
+                applyHiredState(apps);
+                // Let the wheel-landing moment register before the party starts
+                setTimeout(() => openCelebration(apps, true), 900);
+            }
+
+            function sizeCelebrateCanvas() {
+                const rect = celebrateCanvas.getBoundingClientRect();
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                celebrateW = rect.width;
+                celebrateH = rect.height;
+                celebrateCanvas.width = Math.round(rect.width * dpr);
+                celebrateCanvas.height = Math.round(rect.height * dpr);
+                celebrateCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            }
+
+            function spawnConfettiPiece(x, y, vx, vy) {
+                return {
+                    x,
+                    y,
+                    vx,
+                    vy,
+                    rot: Math.random() * TWO_PI,
+                    vr: (Math.random() - 0.5) * 12,
+                    wobble: Math.random() * TWO_PI,
+                    w: 6 + Math.random() * 6,
+                    h: 9 + Math.random() * 7,
+                    color: CELEBRATE_COLORS[Math.floor(Math.random() * CELEBRATE_COLORS.length)],
+                    shape: Math.random() < 0.25 ? 'circle' : 'rect',
+                    life: 2.6 + Math.random() * 1.6
+                };
+            }
+
+            function burstAt(xFrac, yFrac, count) {
+                const x = celebrateW * xFrac;
+                const y = celebrateH * yFrac;
+                for (let i = 0; i < count; i++) {
+                    const a = Math.random() * TWO_PI;
+                    const spd = 160 + Math.random() * 340;
+                    celebrateParticles.push(spawnConfettiPiece(x, y, Math.cos(a) * spd, Math.sin(a) * spd - 120));
+                }
+            }
+
+            function celebrateLoop(now) {
+                if (!celebrating) return;
+                const t = (now - celebrateStart) / 1000;
+                const dt = Math.min(0.033, Math.max(0, (now - celebrateLast) / 1000));
+                celebrateLast = now;
+
+                while (celebrateBursts.length && t >= celebrateBursts[0]) {
+                    celebrateBursts.shift();
+                    burstAt(0.15 + Math.random() * 0.7, 0.2 + Math.random() * 0.25, reduceMotion ? 24 : 70);
+                }
+
+                if (celebrateRain && t < 4.5) {
+                    for (let i = 0; i < 3; i++) {
+                        celebrateParticles.push(spawnConfettiPiece(Math.random() * celebrateW, -12, (Math.random() - 0.5) * 60, 60 + Math.random() * 120));
+                    }
+                } else {
+                    celebrateRain = false;
+                }
+
+                celebrateCtx.clearRect(0, 0, celebrateW, celebrateH);
+                for (let i = celebrateParticles.length - 1; i >= 0; i--) {
+                    const p = celebrateParticles[i];
+                    p.life -= dt;
+                    if (p.life <= 0 || p.y > celebrateH + 30) {
+                        celebrateParticles.splice(i, 1);
+                        continue;
+                    }
+                    p.vx *= Math.max(0, 1 - 1.2 * dt);
+                    p.vy = Math.min(p.vy + 620 * dt, 260);
+                    p.x += p.vx * dt;
+                    p.y += p.vy * dt;
+                    p.rot += p.vr * dt;
+                    p.wobble += dt * 6;
+
+                    celebrateCtx.save();
+                    celebrateCtx.globalAlpha = Math.min(1, p.life);
+                    celebrateCtx.translate(p.x, p.y);
+                    celebrateCtx.rotate(p.rot);
+                    celebrateCtx.scale(Math.cos(p.wobble), 1);
+                    celebrateCtx.fillStyle = p.color;
+                    if (p.shape === 'circle') {
+                        celebrateCtx.beginPath();
+                        celebrateCtx.arc(0, 0, p.w * 0.45, 0, TWO_PI);
+                        celebrateCtx.fill();
+                    } else {
+                        celebrateCtx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+                    }
+                    celebrateCtx.restore();
+                }
+
+                if (celebrateParticles.length || celebrateBursts.length || celebrateRain) {
+                    celebrateRaf = requestAnimationFrame(celebrateLoop);
+                } else {
+                    celebrateRaf = 0;
+                }
+            }
+
+            function openCelebration(apps, fireworks) {
+                celebrateApps = apps;
+                celebrateAppsEl.textContent = apps;
+                celebrateNounEl.textContent = apps === 1 ? 'application' : 'applications';
+                celebrateEl.hidden = false;
+                sizeCelebrateCanvas();
+                celebrating = true;
+                celebrateParticles = [];
+                celebrateStart = performance.now();
+                celebrateLast = celebrateStart;
+                celebrateBursts = fireworks ? (reduceMotion ? [0.1] : [0.05, 0.45, 0.9, 1.5, 2.2]) : [];
+                celebrateRain = fireworks && !reduceMotion;
+                shareToastEl.textContent = '';
+                requestAnimationFrame(() => requestAnimationFrame(() => celebrateEl.classList.add('is-open')));
+                cancelAnimationFrame(celebrateRaf);
+                celebrateRaf = requestAnimationFrame(celebrateLoop);
+                if (navigator.vibrate) navigator.vibrate([60, 40, 120]);
+                setTimeout(() => celebrateCloseEl.focus({ preventScroll: true }), 60);
+            }
+
+            function closeCelebration() {
+                if (!celebrating) return;
+                celebrating = false;
+                celebrateEl.classList.remove('is-open');
+                cancelAnimationFrame(celebrateRaf);
+                celebrateRaf = 0;
+                celebrateParticles = [];
+                celebrateBursts = [];
+                celebrateRain = false;
+                celebrateCtx.clearRect(0, 0, celebrateW, celebrateH);
+                setTimeout(() => {
+                    if (!celebrating) celebrateEl.hidden = true;
+                }, 320);
+            }
+
+            function showToast(msg) {
+                shareToastEl.textContent = msg;
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => { shareToastEl.textContent = ''; }, 2800);
+            }
+
+            function legacyCopy(text) {
+                try {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    ta.setAttribute('readonly', '');
+                    ta.style.position = 'fixed';
+                    ta.style.opacity = '0';
+                    document.body.appendChild(ta);
+                    ta.select();
+                    ta.setSelectionRange(0, 999);
+                    const ok = document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    return ok;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            function copyText(text) {
+                if (navigator.clipboard && window.isSecureContext) {
+                    return navigator.clipboard.writeText(text).then(() => true, () => legacyCopy(text));
+                }
+                return Promise.resolve(legacyCopy(text));
+            }
+
+            function openShare(url) {
+                // Synthetic anchor click: keeps this page open and avoids popup blockers
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            }
+
+            function shareMessage(apps) {
+                return `I got the job after ${apps} application${apps === 1 ? '' : 's'} 🎉 Beat the 0.7% odds.`;
+            }
+
+            function handleShare(kind) {
+                const apps = celebrateApps || wheel.apps;
+                const text = shareMessage(apps);
+                const full = `${text} ${SHARE_URL}`;
+                const enc = encodeURIComponent;
+
+                if (kind === 'native') {
+                    if (navigator.share) {
+                        navigator.share({ title: 'Find a Job in 2026', text, url: SHARE_URL }).catch(() => {});
+                        return;
+                    }
+                    copyText(full).then((ok) => showToast(ok ? 'Link copied. Paste it anywhere.' : 'Could not copy. Try the Copy link button.'));
+                    return;
+                }
+                if (kind === 'whatsapp') {
+                    openShare(`https://wa.me/?text=${enc(full)}`);
+                    return;
+                }
+                if (kind === 'x') {
+                    openShare(`https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(SHARE_URL)}`);
+                    return;
+                }
+                if (kind === 'linkedin') {
+                    // LinkedIn only accepts a URL and builds the card from the page's og: tags
+                    copyText(full).then((ok) => showToast(ok ? 'Post text copied. Paste it into your LinkedIn post.' : 'Opening LinkedIn.'));
+                    openShare(`https://www.linkedin.com/sharing/share-offsite/?url=${enc(SHARE_URL)}`);
+                    return;
+                }
+                if (kind === 'copy') {
+                    copyText(full).then((ok) => showToast(ok ? 'Copied! Paste it anywhere.' : 'Could not copy. Try again.'));
+                }
+            }
+
+            celebrateEl.querySelectorAll('[data-share]').forEach((btn) => {
+                btn.addEventListener('click', () => handleShare(btn.dataset.share));
+            });
+            celebrateCloseEl.addEventListener('click', closeCelebration);
+            celebrateEl.addEventListener('click', (e) => {
+                if (e.target === celebrateEl) closeCelebration();
+            });
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeCelebration();
+            });
+            hiredShareBtn.addEventListener('click', () => openCelebration(wheel.apps, false));
+
             // 4. Bootstrap & Unified Animation Loop
             function handleResize() {
                 resizeWheel();
                 resizeBuzzer();
+                sizeCelebrateCanvas();
+            }
+
+            // Add ?reset to the URL to clear the job-offer state (handy for testing)
+            if (new URLSearchParams(location.search).has('reset')) {
+                try { localStorage.removeItem(HIRED_KEY); } catch (e) {}
+            }
+            const savedHire = readHired();
+            if (savedHire) {
+                wheel.apps = Number(savedHire.apps) || 0;
+                applyHiredState(wheel.apps);
             }
 
             handleResize();
