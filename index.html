@@ -2660,8 +2660,8 @@
                 celebrateRigged = !!rigged;
                 celebrateAppsEl.textContent = apps;
                 celebrateManualEl.innerHTML = celebrateRigged
-                    ? `You got it on attempt <strong>${apps}</strong> with a little nepotism. Applying manually, the job would have landed on attempt <strong>${jobAttempt}</strong>.`
-                    : `You got it on attempt <strong>${apps}</strong>. Applying manually, the job would have landed on attempt <strong>${jobAttempt}</strong>.`;
+                    ? `<strong>★ Nepo button used ★</strong> A friend of a friend pulled strings on attempt <strong>${apps}</strong>. Doing it the honest way, the job would have landed on attempt <strong>${jobAttempt}</strong>, so you skipped <strong>${Math.max(0, jobAttempt - apps)}</strong> applications. Who needs grit when you have connections?`
+                    : `<strong>★ No nepo, pure grit ★</strong> You landed it on attempt <strong>${apps}</strong>. Doing it by hand, the job would have landed on attempt <strong>${jobAttempt}</strong> too. Honest work pays off, eventually.`;
                 celebrateNounEl.textContent = apps === 1 ? 'application' : 'applications';
                 celebrateEl.hidden = false;
                 sizeCelebrateCanvas();
