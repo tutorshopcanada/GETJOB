@@ -2591,9 +2591,9 @@
                 }
             }
 
-            function writeHired(apps) {
+            function writeHired(apps, attempt, rigged) {
                 try {
-                    localStorage.setItem(HIRED_KEY, JSON.stringify({ apps }));
+                    localStorage.setItem(HIRED_KEY, JSON.stringify({ apps, attempt, rigged: !!rigged }));
                 } catch (e) {}
             }
 
@@ -2613,7 +2613,7 @@
 
             function onWin() {
                 const apps = wheel.apps;
-                writeHired(apps);
+                writeHired(apps, jobAttempt, lastSpinRigged);
                 applyHiredState(apps);
                 // Let the wheel-landing moment register before the party starts
                 winTimer = setTimeout(() => openCelebration(apps, true, lastSpinRigged), 900);
@@ -2718,8 +2718,8 @@
                 celebrateRigged = !!rigged;
                 celebrateAppsEl.textContent = apps;
                 celebrateManualEl.innerHTML = celebrateRigged
-                    ? `<strong>★ Nepo button used ★</strong> A friend of a friend pulled strings on attempt <strong>${apps}</strong>. Doing it the honest way, the job would have landed on attempt <strong>${jobAttempt}</strong>, so you skipped <strong>${Math.max(0, jobAttempt - apps)}</strong> applications. Who needs grit when you have connections?`
-                    : `<strong>★ No nepo, pure grit ★</strong> You landed it on attempt <strong>${apps}</strong>. Doing it by hand, the job would have landed on attempt <strong>${jobAttempt}</strong> too. Honest work pays off, eventually.`;
+                    ? `You got it on attempt <strong>${apps}</strong> with a little nepotism. Applying manually, the job would have landed on attempt <strong>${jobAttempt}</strong>.`
+                    : `You got it on attempt <strong>${apps}</strong>. Applying manually, the job would have landed on attempt <strong>${jobAttempt}</strong>.`;
                 celebrateNounEl.textContent = apps === 1 ? 'application' : 'applications';
                 celebrateEl.hidden = false;
                 sizeCelebrateCanvas();
@@ -2794,13 +2794,15 @@
                 a.remove();
             }
 
-            function shareMessage(apps) {
-                return `I got the job after ${apps} application${apps === 1 ? '' : 's'} 🎉 Beat the 0.7% odds.`;
+            function shareMessage(apps, attempt, rigged) {
+                return rigged
+                    ? `I got the job on attempt ${apps} with a little nepotism 🤝 Doing it by hand would have taken until attempt ${attempt}. Who needs grit when you have connections? 🎉`
+                    : `I got the job on attempt ${apps} with pure grit 💪 Doing it by hand would have landed on attempt ${attempt} too. Honest work pays off, eventually. 🎉`;
             }
 
             function handleShare(kind) {
                 const apps = celebrateApps || wheel.apps;
-                const text = shareMessage(apps);
+                const text = shareMessage(apps, jobAttempt, celebrateRigged);
                 const full = `${text} ${SHARE_URL}`;
                 const enc = encodeURIComponent;
 
@@ -2911,10 +2913,12 @@
             const savedHire = readHired();
             if (savedHire) {
                 wheel.apps = Number(savedHire.apps) || 0;
+                jobAttempt = Number(savedHire.attempt) || wheel.apps;
+                celebrateRigged = !!savedHire.rigged;
                 applyHiredState(wheel.apps);
             }
 
-            jobAttempt = rollJobAttempt();
+            if (!savedHire) jobAttempt = rollJobAttempt();
             refreshNepotism();
             handleResize();
             window.addEventListener('resize', handleResize);
