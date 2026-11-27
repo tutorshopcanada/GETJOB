@@ -2787,7 +2787,7 @@
 
             // Nepotism: after 10 attempts, arm the next GET A JOB press to win
             function refreshNepotism() {
-                nepotismEl.hidden = hired || wheel.apps < 10;
+                nepotismEl.hidden = hired || wheel.apps < 5;
             }
 
             nepotismBtn.addEventListener('click', () => {
