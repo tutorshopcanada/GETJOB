@@ -476,10 +476,6 @@
         }
 
         .wheel-status {
-            position: absolute;
-            left: 50%;
-            bottom: 7px;
-            transform: translateX(-50%);
             padding: 3.5px 11px;
             border-radius: 999px;
             background: rgba(17, 24, 39, 0.82);
@@ -505,7 +501,15 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
             padding: 7px 8px 0;
+        }
+
+        .monitor-chin .wheel-status {
+            flex: 0 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .monitor-brand {
@@ -920,7 +924,11 @@
             }
 
             .monitor-brand {
-                font-size: 11px;
+                display: none;
+            }
+
+            .wheel-status {
+                font-size: 10.5px;
             }
 
             .data-bubble {
@@ -1155,10 +1163,10 @@
                         <div id="result-popup-title" class="result-popup-title"></div>
                         <div id="result-popup-quip" class="result-popup-quip"></div>
                     </div>
-                    <div id="wheel-status" class="wheel-status" aria-live="polite">0.7% Offer Odds · Spin</div>
                 </div>
                 <div class="monitor-chin">
                     <span class="monitor-brand">TORONTO-OS 26</span>
+                    <div id="wheel-status" class="wheel-status" aria-live="polite">0.7% Offer Odds · Spin</div>
                     <span id="monitor-led" class="monitor-led" aria-hidden="true"></span>
                 </div>
             </div>
