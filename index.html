@@ -932,6 +932,81 @@
                 min-width: 130px;
             }
         }
+        /* ---------- Nepotism button under the desk (after 10 attempts) ---------- */
+        /* Desktop: pinned under the desk, bottom-left, so it stays on screen */
+        .nepotism {
+            position: fixed;
+            left: 16px;
+            bottom: 16px;
+            width: min(260px, calc(100vw - 32px));
+            text-align: center;
+            z-index: 5;
+        }
+
+        .nepotism[hidden] {
+            display: none;
+        }
+
+        .nepotism-btn {
+            width: 100%;
+            min-height: 46px;
+            padding: 10px 16px;
+            border: 2px dashed #6B7280;
+            border-radius: 14px;
+            background: #F8FAFC;
+            color: #111827;
+            font-family: 'Bricolage Grotesque', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #CBD5E1;
+            transition: transform 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        .nepotism-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+
+        .nepotism-btn:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #CBD5E1;
+        }
+
+        .nepotism-btn:disabled {
+            cursor: default;
+            opacity: 0.7;
+        }
+
+        .nepotism-note {
+            min-height: 1.3em;
+            margin-top: 8px;
+            color: #9F1239;
+            font-size: 13px;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .celebrate-manual {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: #F1F5F9;
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .celebrate-manual strong {
+            color: #111827;
+        }
+
+        @media (max-width: 760px) {
+            .nepotism {
+                position: static;
+                width: min(100%, 300px);
+                margin: 16px auto 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1138,6 +1213,11 @@
                 <canvas id="coral-puck-canvas" aria-label="Get a Job" role="button" tabindex="0"></canvas>
             </div>
         </div>
+
+        <div id="nepotism" class="nepotism" hidden>
+            <button type="button" id="nepotism-btn" class="nepotism-btn">Nepotism Button for Job</button>
+            <p id="nepotism-note" class="nepotism-note" aria-live="polite"></p>
+        </div>
     </div>
 
     <!-- Shown once the 0.7% job offer lands -->
@@ -1151,6 +1231,7 @@
             <span class="celebrate-kicker">★ 0.7% miracle unlocked ★</span>
             <h2 id="celebrate-title" class="celebrate-title">You got the <span>job!</span></h2>
             <p class="celebrate-sub">After <strong id="celebrate-apps">0</strong> <span id="celebrate-noun">applications</span>, the buzzer finally paid off. Now go tell everyone.</p>
+            <p id="celebrate-manual" class="celebrate-manual"></p>
             <div class="celebrate-share">
                 <button type="button" class="share-btn share-btn--primary" data-share="native">Share my win</button>
                 <button type="button" class="share-btn share-btn--whatsapp" data-share="whatsapp">WhatsApp</button>
@@ -1504,13 +1585,15 @@
                 particles: []
             };
 
-            function pickWeightedSegment() {
-                let r = Math.random() * TOTAL_WEIGHT;
-                for (let i = 0; i < WHEEL_SEGMENTS.length; i++) {
-                    r -= WHEEL_SEGMENTS[i].pct;
-                    if (r <= 0) return WHEEL_SEGMENTS[i];
+            function pickLosingSegment() {
+                const losers = WHEEL_SEGMENTS.filter((s) => !s.isWin);
+                const total = losers.reduce((sum, s) => sum + s.pct, 0);
+                let r = Math.random() * total;
+                for (const s of losers) {
+                    r -= s.pct;
+                    if (r <= 0) return s;
                 }
-                return WHEEL_SEGMENTS[1];
+                return losers[losers.length - 1];
             }
 
             function hideResultPopup() {
@@ -1647,7 +1730,15 @@
                 wheel.apps += 1;
                 appsCounterEl.innerHTML = `Apps: <strong>${wheel.apps}</strong>`;
 
-                const seg = pickWeightedSegment();
+                lastSpinRigged = nepotismArmed;
+                const isJobAttempt = nepotismArmed || wheel.apps === jobAttempt;
+                const seg = isJobAttempt ? WHEEL_SEGMENTS.find((s) => s.isWin) : pickLosingSegment();
+                if (nepotismArmed) {
+                    nepotismArmed = false;
+                    nepotismBtn.textContent = 'Nepotism Button for Job';
+                    nepotismBtn.disabled = false;
+                    nepotismNote.textContent = '';
+                }
                 wheel.winningSeg = seg;
                 wheel.isSpinning = true;
                 wheel.elapsed = 0;
@@ -1719,6 +1810,7 @@
                         spawnOutcomeParticles(seg);
                         showResultPopup(seg);
                         if (seg.isWin) onWin();
+                        refreshNepotism();
 
                         if (seg.fx === 'reject') {
                             triggerScreenShake();
@@ -2075,7 +2167,7 @@
             });
 
             window.addEventListener('keydown', (e) => {
-                if (e.repeat || celebrating) return;
+                if (e.repeat || celebrating || e.target instanceof HTMLButtonElement) return;
                 if (e.code === 'Space' || e.code === 'Enter') {
                     e.preventDefault();
                     pressBuzzer();
@@ -2339,6 +2431,10 @@
             const shareToastEl = document.getElementById('share-toast');
             const hiredShareEl = document.getElementById('hired-share');
             const hiredShareBtn = document.getElementById('hired-share-btn');
+            const nepotismEl = document.getElementById('nepotism');
+            const nepotismBtn = document.getElementById('nepotism-btn');
+            const nepotismNote = document.getElementById('nepotism-note');
+            const celebrateManualEl = document.getElementById('celebrate-manual');
             const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
             const CELEBRATE_COLORS = ['#FF2A54', '#FF4D6D', '#FEF08A', '#34D399', '#60A5FA', '#C084FC', '#FDBA74', '#FFFFFF'];
 
@@ -2354,6 +2450,17 @@
             let celebrateW = 0;
             let celebrateH = 0;
             let toastTimer = 0;
+            let nepotismArmed = false;
+            let lastSpinRigged = false;
+            let celebrateRigged = false;
+            // The attempt a manual applicant would have landed on. Rolled once per session
+            // from the 0.7% rate (geometric: attempts until the first success).
+            let jobAttempt = 0;
+            const OFFER_RATE = WHEEL_SEGMENTS.find((s) => s.isWin).pct / 100;
+            function rollJobAttempt() {
+                const u = Math.random();
+                return Math.max(1, Math.ceil(Math.log(1 - u) / Math.log(1 - OFFER_RATE)));
+            }
 
             function readHired() {
                 try {
@@ -2381,6 +2488,7 @@
                 wheelStatusEl.classList.add('is-win');
                 appsCounterEl.innerHTML = `Apps: <strong>${apps}</strong>`;
                 hiredShareEl.hidden = false;
+                nepotismEl.hidden = true;
             }
 
             function onWin() {
@@ -2388,7 +2496,7 @@
                 writeHired(apps);
                 applyHiredState(apps);
                 // Let the wheel-landing moment register before the party starts
-                setTimeout(() => openCelebration(apps, true), 900);
+                setTimeout(() => openCelebration(apps, true, lastSpinRigged), 900);
             }
 
             function sizeCelebrateCanvas() {
@@ -2485,9 +2593,13 @@
                 }
             }
 
-            function openCelebration(apps, fireworks) {
+            function openCelebration(apps, fireworks, rigged) {
                 celebrateApps = apps;
+                celebrateRigged = !!rigged;
                 celebrateAppsEl.textContent = apps;
+                celebrateManualEl.innerHTML = celebrateRigged
+                    ? `You got it on attempt <strong>${apps}</strong> with a little nepotism. Applying manually, the job would have landed on attempt <strong>${jobAttempt}</strong>.`
+                    : `You got it on attempt <strong>${apps}</strong>. Applying manually, the job would have landed on attempt <strong>${jobAttempt}</strong>.`;
                 celebrateNounEl.textContent = apps === 1 ? 'application' : 'applications';
                 celebrateEl.hidden = false;
                 sizeCelebrateCanvas();
@@ -2609,7 +2721,20 @@
             window.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') closeCelebration();
             });
-            hiredShareBtn.addEventListener('click', () => openCelebration(wheel.apps, false));
+            hiredShareBtn.addEventListener('click', () => openCelebration(wheel.apps, false, celebrateRigged));
+
+            // Nepotism: after 10 attempts, arm the next GET A JOB press to win
+            function refreshNepotism() {
+                nepotismEl.hidden = hired || wheel.apps < 10;
+            }
+
+            nepotismBtn.addEventListener('click', () => {
+                if (hired || wheel.isSpinning || nepotismArmed) return;
+                nepotismArmed = true;
+                nepotismBtn.disabled = true;
+                nepotismBtn.textContent = 'Nepotism armed';
+                nepotismNote.textContent = 'Tip from your connection: the next GET A JOB button is the one. It is rigged to get you the job.';
+            });
 
             // 4. Bootstrap & Unified Animation Loop
             function handleResize() {
@@ -2628,6 +2753,8 @@
                 applyHiredState(wheel.apps);
             }
 
+            jobAttempt = rollJobAttempt();
+            refreshNepotism();
             handleResize();
             window.addEventListener('resize', handleResize);
 
