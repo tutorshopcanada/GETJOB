@@ -1099,12 +1099,18 @@
             .nepotism {
                 position: static;
                 transform: none;
-                margin: 18px auto 0;
-                max-width: 100%;
+                align-self: flex-start;
+                width: 220px;
+                margin: 18px 0 0;
+                max-width: none;
             }
 
             .nepotism-btn {
                 transform: rotate(-2deg);
+                white-space: normal;
+                width: 100%;
+                padding: 10px 14px;
+                line-height: 1.15;
             }
         }
 
@@ -1122,13 +1128,6 @@
             color: #111827;
         }
 
-        @media (max-width: 760px) {
-            .nepotism {
-                position: static;
-                width: min(100%, 300px);
-                margin: 16px auto 0;
-            }
-        }
     </style>
 </head>
 <body>
